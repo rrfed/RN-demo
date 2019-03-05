@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, View, Text, Image } from "react-native";
+import { Button, View, Text, Image, TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createStackNavigator, createBottomTabNavigator, createAppContainer } from "react-navigation";
+import codepush from "react-native-code-push"
 
 import FlatListScreen from "./Component/FlatList"
 import ViewAndTextScreen from "./Component/View+Text"
@@ -192,7 +193,7 @@ const HomeStack = createStackNavigator(
       // headerBackImage: <Image source={{uri: 'tabbar_homepage_normal'}} style={{width:20, height: 20}} />
     },
     navigationOptions: {
-      tabBarLabel: '首页',
+      tabBarLabel: '就叫首页',
     }
   }
 )
@@ -240,7 +241,7 @@ const TabNavigator = createBottomTabNavigator({
 
         // You can return any component that you like here!
         // return <IconComponent name={iconName} size={25} color={tintColor} />;
-        return <Image source={{uri: iconName}} style={{width:20, height: 20}} />
+        return <Image source={{ uri: iconName }} style={{ width: 20, height: 20 }} />
       },
     }),
     navigationOptions: {
@@ -290,7 +291,30 @@ const AppStack = createStackNavigator({
 const AppContainer = createAppContainer(AppStack);
 
 export default class App extends React.Component {
+
+  componentDidMount() {
+    codepush.sync({ installMode: codepush.InstallMode.IMMEDIATE });
+  }
+
   render() {
-    return <AppContainer />;
+    return (
+      <View style={{ backgroundColor: 'white', height: 100, marginTop: 100 }}>
+        <TouchableOpacity onPress={this.onButtonPress}>
+          <Text style={{ color: 'red' }}>Check for updates</Text>
+        </TouchableOpacity>
+        <Text style={{ marginTop: 30 }}>测试文本1111222223333</Text>
+      </View>
+    )
+    // <AppContainer />;
+  }
+
+  onButtonPress() {
+    codepush.sync({
+      updateDialog: true,
+      installMode: codepush.InstallMode.IMMEDIATE
+    });
   }
 }
+let codePushOptions = { checkFrequency: codepush.CheckFrequency.MANUAL }
+
+App = codepush(codePushOptions)(App)
