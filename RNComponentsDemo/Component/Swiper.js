@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ScrollView, View, Image, StyleSheet, StatusBar } from 'react-native';
 import Swiper from 'react-native-swiper';
+import { fetchRequest } from "./API/Network";
 
 import banner0 from "../src/banner0.jpg"
 import banner1 from "../src/banner1.jpeg"
@@ -10,45 +11,60 @@ import banner4 from "../src/banner4.jpeg"
 import banner5 from "../src/banner5.jpg"
 import banner6 from "../src/banner6.png"
 import banner7 from "../src/banner7.jpeg"
- 
+// import console = require('console');
+
 var Dimensions = require('Dimensions')
-var {width, height} = Dimensions.get('window')
+var { width, height } = Dimensions.get('window')
 var BaseImageURL = "http://demo3.renrunkeji.com:8151/api/file/image/"
-var REQUEST_BANNER_URL = "http://demo3.renrunkeji.com:8151/api/wns/banner/page?current=1&size=20&status=1"
 
 export default class MySwiper extends Component {
     static navigationOptions = ({ navigation }) => {
         return {
-          title: 'Swiper'
+            title: 'Swiper'
         }
     }
 
     constructor(props) {
         super(props);
         this.state = {
-            bannerData:[],
+            bannerData: [],
         }
     }
+
     componentDidMount() {
         this.getBannerData();
     }
 
     //  获取Banner数据源
     async getBannerData() {
-        try {
-            const response = await fetch(REQUEST_BANNER_URL);
-            const responseJson = await response.json();
-            // 注意，这里使用了this关键字，为了保证this在调用时仍然指向当前组件，我们需要对其进行“绑定”操作
-            this.setState({
-                // 注意这里使用了数组的 concat 方法生成新数组，不能直接在原数组上 push！
-                bannerData: this.state.bannerData.concat(responseJson.records),
-            }, function() {
-            });
-            return responseJson;
+        // try {
+        //     const response = await fetch(REQUEST_BANNER_URL);
+        //     const responseJson = await response.json();
+        //     // 注意，这里使用了this关键字，为了保证this在调用时仍然指向当前组件，我们需要对其进行“绑定”操作
+        //     this.setState({
+        //         // 注意这里使用了数组的 concat 方法生成新数组，不能直接在原数组上 push！
+        //         bannerData: this.state.bannerData.concat(responseJson.records),
+        //     }, function() {
+        //     });
+        //     return responseJson;
+        // }
+        // catch (error) {
+        //     console.error('error:' + error);
+        // }
+        let params = {
+            current: '1',
+            size: '20',
+            status: '1'
         }
-        catch (error) {
-            console.error('error:' + error);
-        }
+        fetchRequest('wns/banner/page', 'GET', params)
+            .then(res => {
+                this.setState({
+                    // 注意这里使用了数组的 concat 方法生成新数组，不能直接在原数组上 push！
+                    bannerData: this.state.bannerData.concat(res.records),
+                })
+            }).catch(err => {
+                alert(err)
+            })
     }
 
     renderNetSwiper() {
@@ -60,11 +76,11 @@ export default class MySwiper extends Component {
             itemArr.push(
 
                 <View style={styles.slide} key={index}>
-                    <Image 
+                    <Image
                         style={styles.image}
                         source={{ uri: imageURL }}
                         resizeMode='stretch'
-                        // defaultSource={{ uri: '/Users/rr/RNComponentsDemo/src/banner1.jpeg' }}
+                    // defaultSource={{ uri: '/Users/rr/RNComponentsDemo/src/banner1.jpeg' }}
                     />
                 </View>
 
@@ -84,9 +100,9 @@ export default class MySwiper extends Component {
             let image = images[index]
             itemArr.push(
                 <View style={styles.slide} key={index}>
-                    <Image 
+                    <Image
                         style={styles.image}
-                        source={ image }
+                        source={image}
                         resizeMode='stretch'
                     />
                 </View>
@@ -97,9 +113,9 @@ export default class MySwiper extends Component {
 
     render() {
         return (
-            <ScrollView 
+            <ScrollView
                 automaticallyAdjustContentInsets={false}
-                scrollEnabled={false}    
+                scrollEnabled={false}
             >
                 <StatusBar barStyle='light-content' />
                 <Swiper
@@ -113,13 +129,13 @@ export default class MySwiper extends Component {
                     autoplay={true}
                     autoplayTimeout={2}
                 >
-                    {this.renderNetSwiper()}    
+                    {this.renderNetSwiper()}
 
                 </Swiper>
 
                 <Swiper
                     key={800}
-                    style={{height:180}}
+                    style={{ height: 180 }}
                     dot={<View style={{ backgroundColor: 'black', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3 }} />}
                     activeDot={<View style={{ backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3 }} />}
                     paginationStyle={{
@@ -129,12 +145,12 @@ export default class MySwiper extends Component {
                     autoplay={true}
                     autoplayTimeout={2}
                 >
-                    {this.renderLocalSwiper()}  
-                </Swiper>    
+                    {this.renderLocalSwiper()}
+                </Swiper>
 
                 <Swiper
                     key={900}
-                    style={{height:180}}
+                    style={{ height: 180 }}
                     dot={<View style={{ backgroundColor: 'black', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3 }} />}
                     activeDot={<View style={{ backgroundColor: '#fff', width: 8, height: 8, borderRadius: 4, marginLeft: 3, marginRight: 3, marginTop: 3, marginBottom: 3 }} />}
                     paginationStyle={{
@@ -144,10 +160,10 @@ export default class MySwiper extends Component {
                     autoplay={true}
                     autoplayTimeout={2}
                 >
-                    {this.renderLocalSwiper()}  
-                </Swiper> 
+                    {this.renderLocalSwiper()}
+                </Swiper>
 
-                
+
             </ScrollView>
         )
     }
@@ -155,15 +171,15 @@ export default class MySwiper extends Component {
 
 const styles = StyleSheet.create({
     wrapper: {
-    height:180
+        height: 180
     },
     slide: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#9dd6eb',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#9dd6eb',
     },
     image: {
-      width: width,
-      height: 180
+        width: width,
+        height: 180
     },
 })
